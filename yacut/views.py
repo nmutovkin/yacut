@@ -65,12 +65,8 @@ def index_view():
         db.session.add(url_map)
         db.session.commit()
 
-        url_root = request.url_root
-        if url_root == r'http://127.0.0.1:5000/':
-            url_root = r'http://localhost/'
-
         flash_message = (f'Ваша новая ссылка готова:\n'
-                         f'<a href="{url_root}{short_id}">'
+                         f'<a href="{request.url_root}{short_id}">'
                          f'{request.url_root}{short_id}</a>')
 
         flash(flash_message)
