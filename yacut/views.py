@@ -1,7 +1,7 @@
 import re
 import uuid
 
-from flask import abort, flash, redirect, render_template, request
+from flask import flash, redirect, render_template, request
 
 from . import app, db
 from .forms import URLMapForm
@@ -25,7 +25,7 @@ def check_short_id(short_id, api=False):
         if api:
             return False, f'Имя "{short_id}" уже занято.'
         return False, f'Имя {short_id} уже занято!'
-    if len(short_id) > 16 or not PATTERN.fullmatch(short_id):
+    if api and (len(short_id) > 16 or not PATTERN.fullmatch(short_id)):
         return False, 'Указано недопустимое имя для короткой ссылки'
 
     return True, ''
@@ -33,10 +33,7 @@ def check_short_id(short_id, api=False):
 
 @app.route('/<string:id>')
 def redirect_view(id):
-    url_obj = URL_map.query.filter_by(short=id).first()
-
-    if not url_obj:
-        abort(404)
+    url_obj = URL_map.query.filter_by(short=id).first_or_404()
 
     original_link = url_obj.original
     return redirect(original_link)
